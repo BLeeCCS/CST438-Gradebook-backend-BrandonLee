@@ -165,5 +165,46 @@ public class GradeBookController {
 		
 		return assignment;
 	}
-
+	
+	/*********************
+	As an instructor for a course , I can add a new assignment for my course.  The assignment has a name and a due date.
+	As an instructor, I can change the name of the assignment for my course.
+	As an instructor, I can delete an assignment  for my course (only if there are no grades for the assignment).
+	**********************/
+	@PostMapping("/gradebook/addAssignment")
+	@Transactional
+	public void addAssignment(@RequestBody Assignment assignment) {
+	   Assignment assign = new Assignment();
+       assign.setDueDate(assignment.getDueDate());
+       assign.setName(assignment.getName());
+       assignmentRepository.save(assign);
+	}
+	
+	@PutMapping("/gradebook/changeAssignmentName/{id}")
+	@Transactional
+	public void changeAssignmentName(@RequestBody String name, @PathVariable("id") int assignmentId) {
+	   
+	   String email = "dwisneski@csumb.edu";  
+	   Assignment assignment = checkAssignment(assignmentId, email);  
+                       
+      if(assignment == null) {
+         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid assignment Id");
+      }
+      
+      assignment.setName(name);
+      assignmentRepository.save(assignment);
+	}
+	
+	@DeleteMapping("/gradebook/deleteAssignment/{id}")
+	@Transactional	
+	public void deleteAssignment(@PathVariable("id") int assignmentId){
+	   
+      String email = "dwisneski@csumb.edu";
+	   Assignment delAssign = checkAssignment(assignmentId, email);	   
+	   if(delAssign.getNeedsGrading() == 0) {
+	      throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment already graded. "+assignmentId );	      
+	   }
+   
+	   assignmentRepository.delete(delAssign);
+	}
 }
