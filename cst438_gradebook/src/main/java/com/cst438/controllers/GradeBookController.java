@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,6 +48,7 @@ public class GradeBookController {
 	@GetMapping("/gradebook")
 	public AssignmentListDTO getAssignmentsNeedGrading( ) {
 		
+		
 		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
 		
 		List<Assignment> assignments = assignmentRepository.findNeedGradingByEmail(email);
@@ -54,6 +56,7 @@ public class GradeBookController {
 		for (Assignment a: assignments) {
 			result.assignments.add(new AssignmentListDTO.AssignmentDTO(a.getId(), a.getCourse().getCourse_id(), a.getName(), a.getDueDate().toString() , a.getCourse().getTitle()));
 		}
+		
 		return result;
 	}
 	
@@ -173,16 +176,18 @@ public class GradeBookController {
 	**********************/
 	@PostMapping("/gradebook/addAssignment")
 	@Transactional
-	public void addAssignment(@RequestBody Assignment assignment) {
-	   Assignment assign = new Assignment();
-       assign.setDueDate(assignment.getDueDate());
-       assign.setName(assignment.getName());
-       assignmentRepository.save(assign);
+	public void addAssignment(@RequestBody Assignment assignment) { 
+		
+		Assignment assign = new Assignment();
+		assign.setDueDate(assignment.getDueDate());
+		assign.setName(assignment.getName());
+		assign.setCourse(assignment.getCourse());
+		assignmentRepository.save(assign);
 	}
 	
-	@PutMapping("/gradebook/changeAssignmentName/{id}")
+	@PutMapping("/gradebook/editAssignmentName/{id}")
 	@Transactional
-	public void changeAssignmentName(@RequestBody String name, @PathVariable("id") int assignmentId) {
+	public void editAssignmentName(@RequestBody String name, @PathVariable("id") int assignmentId) {
 	   
 	   String email = "dwisneski@csumb.edu";  
 	   Assignment assignment = checkAssignment(assignmentId, email);  
