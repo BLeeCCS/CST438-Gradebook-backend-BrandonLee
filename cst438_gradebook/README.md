@@ -32,3 +32,4 @@
 - adds a student to a course
 - body contains JSON for EnrollmentDTO
 
+### Testing
